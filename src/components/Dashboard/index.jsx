@@ -1,18 +1,21 @@
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 
-export default () => {
+const Dashboard = (props) => {
 
     const logout = () => {
         localStorage.removeItem("myToken");
-        window.location.reload();
+        props.history.push('/');
     }
 
     return (
         <div>
             Dashboard Page
 
-            <button onClick={logout} >Logout</button>
+            <button onClick={logout}>Logout</button>
 
         </div>
     );
 }
+
+export default withRouter(Dashboard);

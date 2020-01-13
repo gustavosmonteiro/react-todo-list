@@ -11,3 +11,7 @@ export const authenticateAPI = (email, password) => {
                 }
             });
 }
+
+export const isAuthenticated = () => {
+    return !!localStorage.getItem("myToken");
+}

@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {authenticateAPI} from '../../api/APIUtils';
+import {withRouter} from 'react-router-dom';
 
-
-export default () => {
+const Auth = (props) => {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
 
@@ -16,7 +16,7 @@ export default () => {
                 console.log(response);
                 const myToken = response.data.result.token;
                 localStorage.setItem("myToken", myToken);
-                window.location.reload();
+                props.history.push('/');
             }
         ).catch(console.error);
 
@@ -42,3 +42,5 @@ export default () => {
         </div>
     );
 }
+
+export default withRouter(Auth);
