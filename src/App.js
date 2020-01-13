@@ -1,11 +1,11 @@
 import React from 'react';
-import Auth from './components/Auth';
+import Main from './components/Main';
 
 
 function App() {
   return (
     <div>
-      <Auth/>
+      <Main/>
     </div>
   );
 }

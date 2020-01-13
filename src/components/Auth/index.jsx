@@ -16,6 +16,7 @@ export default () => {
                 console.log(response);
                 const myToken = response.data.result.token;
                 localStorage.setItem("myToken", myToken);
+                window.location.reload();
             }
         ).catch(console.error);
 
