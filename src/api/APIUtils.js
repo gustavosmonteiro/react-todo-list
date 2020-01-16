@@ -43,6 +43,19 @@ export const getProjects = () => {
     });
 }
 
+export const updateProject = (id, name) => {
+    return axios({
+        method: 'put',
+        url: `http://18.228.59.15:3000/projects/${id}`,
+        data: {
+            name
+        },
+        headers: {
+            authorization: getToken()
+        }
+    });
+}
+
 export const deleteProject = (id) => {
     return axios({
         method: 'delete',
