@@ -1,96 +1,85 @@
-import React, {useState, useEffect} from 'react';
-import {withRouter} from 'react-router-dom';
-import {getProjects, updateProject, deleteProject} from '../../api/APIUtils';
-import NewProject from './create';
+import React, { useState, useEffect } from "react";
+import { withRouter } from "react-router-dom";
+import { getProjects, updateProject, deleteProject } from "../../api/APIUtils";
+import NewProject from "./create";
+import ProjectItem from "../ListItem";
+import Task from "../Task";
 
-const Dashboard = (props) => {
+const Dashboard = props => {
+  const [refreshList, setRefreshList] = useState(true);
+  const [projectList, setProjectList] = useState([]);
 
-    const [refreshList, setRefreshList] = useState(true);
-    const [projectList, setProjectList] = useState([]);
-    const [projectName, setProjectName] = useState("");
-
-    useEffect(() => {
-        if (refreshList) {
-            getProjects().then(
-                (response) => {
-                    console.log(response);
-                    setProjectList(response.data.result);
-                    setRefreshList(false);
-                }
-            ).catch(console.error);
-        }
-
-        return () => {
-            if (refreshList) {
-                setRefreshList(false);
-            }
-        };
-    }, [refreshList]);
-
-    const toggleUpdateProjectMode = (id) => {
-        const projectIndex = projectList.findIndex(project => project._id === id);
-        setProjectName(projectList[projectIndex].name);
-        projectList[projectIndex].editing = !projectList[projectIndex].editing;
-        setProjectList([...projectList]);
-    }
-
-    const saveProject = (id, name) => {
-        const projectIndex = projectList.findIndex(project => project._id === id);
-        projectList[projectIndex].name = name;
-        setProjectList([...projectList]);
-        updateProject(id, name)
-        .then(
-            () => {
-                setRefreshList(true);
-                toggleUpdateProjectMode(id);
-            }
-        )
+  useEffect(() => {
+    if (refreshList) {
+      getProjects()
+        .then(response => {
+          console.log(response);
+          setProjectList(response.data.result);
+          setRefreshList(false);
+        })
         .catch(console.error);
     }
 
-    const manageDeleteProject = (id) => {
-        deleteProject(id)
-        .then(() => setRefreshList(true))
-        .catch(console.error);
-    }
+    return () => {
+      if (refreshList) {
+        setRefreshList(false);
+      }
+    };
+  }, [refreshList]);
 
-    const logout = () => {
-        localStorage.removeItem("myToken");
-        props.history.push('/');
-    }
+  const toggleUpdateProjectMode = id => {
+    const projectIndex = projectList.findIndex(project => project._id === id);
+    projectList[projectIndex].editing = !projectList[projectIndex].editing;
+    setProjectList([...projectList]);
+  };
 
-    return (
-        <div>
-            Dashboard Page
-            <div>
-                <ul>
-                    {projectList.map(project => (
-                        <li key={project._id}>
-                            {(!project.editing && (
-                                <div>
-                                    {project.name}
-                                    <button onClick={()=> toggleUpdateProjectMode(project._id)}>edit</button>
-                                    <button onClick={()=> manageDeleteProject(project._id)}>x</button>
-                                </div>
-                            )) || (
-                                <div>
-                                    <input type="text" value = {projectName} onChange={event => setProjectName(event.target.value)}/>
-                                    <button onClick={()=> saveProject(project._id, projectName)}>Save</button>
-                                    <button onClick={()=> toggleUpdateProjectMode(project._id)}>Cancel</button>
-                                </div>
-                                )
-                            }
-                        </li>
-                    ))}
-                </ul>
-            </div>
+  const saveProject = (id, name) => {
+    const projectIndex = projectList.findIndex(project => project._id === id);
+    projectList[projectIndex].name = name;
+    setProjectList([...projectList]);
+    updateProject(id, name)
+      .then(() => {
+        setRefreshList(true);
+        toggleUpdateProjectMode(id);
+      })
+      .catch(console.error);
+  };
 
-            <button onClick={logout}>Logout</button>
+  const manageDeleteProject = id => {
+    deleteProject(id)
+      .then(() => setRefreshList(true))
+      .catch(console.error);
+  };
 
-            <NewProject setRefreshList={setRefreshList}/>
+  const logout = () => {
+    localStorage.removeItem("myToken");
+    props.history.push("/");
+  };
 
-        </div>
-    );
-}
+  return (
+    <div>
+      Dashboard Page
+      <div>
+        <ul>
+          {projectList.map(project => (
+            <li key={project._id}>
+              <ProjectItem
+                item={project}
+                id="_id"
+                value="name"
+                toggleItemEditing={toggleUpdateProjectMode}
+                saveItem={saveProject}
+                deleteItem={manageDeleteProject}
+                render={(projectId)=><Task projectId={projectId} setRefreshList={setRefreshList}/>}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+      <button onClick={logout}>Logout</button>
+      <NewProject setRefreshList={setRefreshList} />
+    </div>
+  );
+};
 
 export default withRouter(Dashboard);
